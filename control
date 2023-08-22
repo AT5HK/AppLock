@@ -1,0 +1,9 @@
+Package: com.yourcompany.applock
+Name: AppLock
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: auston salvana
+Author: auston salvana
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3)
