@@ -1,6 +1,6 @@
 { 
     
 Filter = { 
-            Bundles = ( "com.Raca.KillerClownCall" ); 
+            Bundles = ( "com.apple.springboard"); 
          }; 
 }
