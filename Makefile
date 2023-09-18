@@ -15,7 +15,7 @@ AppLock_PRIVATE_FRAMEWORKS = Preferences MobileCoreServices UIKitCore #SpringBoa
 # stops symbols error but the entire tweak stops working even SBPowerDownController
 
 AppLock_EXTRA_FRAMEWORKS = AltList
-AppLock_CFLAGS = -fobjc-arc -I./Frameworks/AltList.framework/Headers
+AppLock_CFLAGS = -fobjc-arc #-I./Frameworks/AltList.framework/Headers
 
 AppLock_LDFLAGS = -v #-L./Frameworks/AltList.framework
 

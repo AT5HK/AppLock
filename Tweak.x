@@ -1,34 +1,4 @@
-
-#import <UIKit/UIKit.h>
-#import "ButtonClass.h"
-// #import <AltList/AltList.h>
-#import <AltList/LSApplicationProxy+AltList.h>
-
-
-@interface SBHomeScreenBackdropViewBase: UIView
-@end
-
-@interface SBPowerDownController
-
-@end
-
-@interface SBUIController : NSObject <UIGestureRecognizerDelegate> {
-   SBHomeScreenBackdropViewBase* _homeScreenBackdropView;
-   UIView* _contentView;
-   // SBHomeScreenWindow* _window; //shows up in limenos class dump but not in theos/vendor/includes
-   //have to dump Springboard.framework myself for ios 12 and see if the headers contain it 
-}
-- (id)valueForKey:(NSString *)arg1;
-+(id)sharedInstanceIfExists;
-+(id)sharedInstance;
-@end
-
-@interface SBHomeScreenViewController: UIViewController
-@end
-
-// @interface SBHomeScreenWindow : SBWindow
-// @property (nonatomic,readonly) SBHomeScreenViewController * homeScreenViewController;
-// @end
+#import "Tweak.h"
 
 %hook SBHomeScreenViewController
 
@@ -44,19 +14,30 @@
 }
 
 %new
--(void)buttonAction {
+-(void)showAlertControllerPasswordChecker:(void(^)(NSString *alertViewText))completion {
    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"My Alert"
                                message:@"This is an alert."
                                preferredStyle:UIAlertControllerStyleAlert];
    
    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-      handler:^(UIAlertAction * action) {}];
+      handler:^(UIAlertAction * action) 
+      {
+         UITextField *alertViewTextField = alert.textFields[0];
+         completion(alertViewTextField.text);
+      }];
    
-   [alert addAction:defaultAction];
+   
    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.secureTextEntry = true;
     }];
+
+   [alert addAction:defaultAction];
    [self presentViewController:alert animated:YES completion:nil];
+}
+
+%new
+-(void)buttonAction {
+   NSLog(@"fuck button action called");
 }
 
 %end
@@ -65,41 +46,59 @@
 
 -(void)activateApplication:(id)arg1 fromIcon:(id)arg2 location:(long long)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
    // SBHomeScreenBackdropViewBase *homeScreenBackdrop = [((SBUIController*)self) valueForKey:@"_homeScreenBackdropView"];
-
-   // SBHomeScreenWindow *homeScreenWindow = [self valueForKey:@"_window"];
-   // SBHomeScreenViewController *homeScreenVC = homeScreenWindow.homeScreenViewController;
-   // [homeScreenVC buttonAction];
-   NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
    // [homeScreenBackdrop setBackgroundColor:[UIColor redColor]];
 
+   NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
+   SBApplication *SBApp = arg1;
+   NSString *bundleID = SBApp.bundleIdentifier;
+   NSLog(@"the bundleID: %@", bundleID);
 
-   // UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"My Alert"
-   //                             message:@"This is an alert."
-   //                             preferredStyle:UIAlertControllerStyleAlert];
- 
-   // UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-   //    handler:^(UIAlertAction * action) {}];
+   if ([bundleID isEqual:@"com.Raca.KillerClownCall"]) {
+      SBHomeScreenWindow *homeScreenWindow = [self valueForKey:@"_window"];
+      SBHomeScreenViewController *homeScreenVC = homeScreenWindow.homeScreenViewController;
+      // [homeScreenVC buttonAction];
+      [homeScreenVC showAlertControllerPasswordChecker:^(NSString *alertViewText) {
+        if ([alertViewText isEqual:@"password"]) {
+            %orig;
+        } else {
+            //wrong password do nothing
+        }
+      }];
+   } else {
+      %orig;
+   }
    
-   // [alert addAction:defaultAction];
-   // [self presentViewController:alert animated:YES completion:nil];
+  
 
+
+   /* 
+   can only reference SBUIController using %c even though I can see the header file
+    inside $theos/vendor/include, but i can reference SBApplication from here just fine
+   */
+
+   //sharedInstance is a class method %c allows me to get the class definition
+   SBUIController *SBVC = [%c(SBUIController) sharedInstance]; 
+   NSLog(@"%@", SBVC);
+   UIView *myView = [SBVC valueForKey:@"_contentView"];
+   [myView setBackgroundColor:[UIColor purpleColor]];
+
+   UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleSingleTap)];
+    tapGesture.delegate = self;
+    [myView addGestureRecognizer:tapGesture];
    
-
-
-   // SBUIController *SBVC = [SBUIController sharedInstance];
-   // NSLog(@"%@", SBVC);
-   // UIView *myView = [SBVC valueForKey:@"_contentView"];
-   // [myView setBackgroundColor:[UIColor blackColor]];
-   
-   %orig;
 }
 
+%new
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-   BOOL shouldBegin = %orig; 
-   NSLog(@"gesture recog: %d", shouldBegin);
-   %log(@"gesture recognizer should begin: ", (BOOL)shouldBegin);
-   return shouldBegin;
+   NSLog(@"gesture recog");
+   return true;
 }
+
+%new
+-(void)handleSingleTap {
+   NSLog(@"its a single tap");
+}
+
 %end
 
 %hook SBPowerDownController 
@@ -119,40 +118,6 @@
 
 
 %end
-
-
-// %hook ViewController
-
-//  -(void)viewDidLoad {
-
-//     ((ViewController*)self).view.backgroundColor = [UIColor blueColor];
-//     %log((NSString *)@"is the view loaded yet", (BOOL)[self isViewLoaded]);
-
-//     %log((NSString *)@"iOSRE", (int)123);
-// 	%orig;
-
-//     ButtonClass *buttonClass = [[ButtonClass alloc]init];
-//     UIButton *greenButton = [buttonClass createButton];
-//     [greenButton addTarget:self action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
-//     [((ViewController*)self).view addSubview:greenButton];
-//  }
-
-//  %new
-//  - (void)buttonAction {
-//     NSLog(@"button action called");
-    
-//     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"My Alert"
-//                                message:@"This is an alert."
-//                                preferredStyle:UIAlertControllerStyleAlert];
- 
-// UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-//    handler:^(UIAlertAction * action) {}];
- 
-// [alert addAction:defaultAction];
-// [((ViewController*)self) presentViewController:alert animated:YES completion:nil];
-//  }
-
-// %end
 
  //you can add commas to %init to init more classes
  %ctor {
