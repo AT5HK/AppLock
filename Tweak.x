@@ -1,4 +1,87 @@
 #import "Tweak.h"
+#import "dlfcn.h"
+// #import "SpringBoard.h"
+
+// %hook _WGWidgetRemoteViewController 
+
+// %end
+
+// %hook FBProcessManager
+
+// // iOS >= 15
+// - (id)_bootstrapProcessWithExecutionContext:(FBProcessExecutionContext *)executionContext synchronously:(BOOL)synchronously error:(id *)error
+// {
+
+//    %log(@"wtf the damn process");
+//    NSLog(@"wtf the damn process");
+// 	return %orig;
+// }
+
+// // iOS 13 - 14
+// - (id)_createProcessWithExecutionContext:(FBProcessExecutionContext *)executionContext
+// {
+//    %log(@"wtf the damn process");
+//    NSLog(@"wtf the damn process");
+// 	return %orig;
+// }
+
+// // iOS <= 12
+// - (id)createApplicationProcessForBundleID:(NSString *)bundleIdentifier withExecutionContext:(FBProcessExecutionContext *)executionContext
+// {
+
+  
+//    %log(@"wtf the damn process");
+//    NSLog(@"wtf the damn process");
+//    return %orig;
+
+// }
+
+
+// %end
+
+// %hook SBIconView
+// -(BOOL)gestureRecognizerShouldBegin:(id)arg1 {
+//    return false;
+// }
+// %end
+
+// %hook SBIconImageView
+
+// -(BOOL)setHidden:(BOOL)arg1 {
+//    return true;
+// }
+
+// %end
+
+
+
+// %hook SBApplicationController
+
+   // - (id)runningApplications {
+   //    id runningApps = %orig;
+   //    NSLog(@"the running apps: %@", runningApps);
+   //    return runningApps;
+   // }
+
+
+   // -(BOOL)scheduler:(id)arg1 requestsApplicationLaunch:(id)arg2 {
+   //    NSLog(@"scheduled app");
+   //    return %orig;
+   // }
+
+   // - (id)_lock_applicationWithBundleIdentifier:(id)arg1 {
+   //    id lockedApp = %orig;
+   //    NSLog(@"succesfully locked application: %@", lockedApp);
+   //    return lockedApp;
+   // }
+
+   // - (BOOL)scheduler:(id)arg1 requestsApplicationLaunch:(id)arg2 {
+      
+   // }
+
+// %end
+
+// SBApplicationController *appController;
 
 %hook SBHomeScreenViewController
 
@@ -9,8 +92,8 @@
    UIButton *greenButton = [buttonClass createButton];
    [greenButton addTarget:self action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
    [self.view addSubview:greenButton];
-
-   
+   // appController = [%c(SBApplicationController) sharedInstance];
+   self.view.backgroundColor = UIColor.purpleColor;
 }
 
 %new
@@ -37,7 +120,9 @@
 
 %new
 -(void)buttonAction {
-   NSLog(@"fuck button action called");
+   NSLog(@"yellow button action");
+   // [[objc_getClass("SpringBoard") sharedInstance] _simulateHomeButtonPress];
+
 }
 
 %end
@@ -53,10 +138,13 @@
    NSString *bundleID = SBApp.bundleIdentifier;
    NSLog(@"the bundleID: %@", bundleID);
 
-   if ([bundleID isEqual:@"com.Raca.KillerClownCall"]) {
+   
+
+
+   if ([bundleID isEqual:@"com.zhiliaoapp.musically"]) {
       SBHomeScreenWindow *homeScreenWindow = [self valueForKey:@"_window"];
       SBHomeScreenViewController *homeScreenVC = homeScreenWindow.homeScreenViewController;
-      // [homeScreenVC buttonAction];
+
       [homeScreenVC showAlertControllerPasswordChecker:^(NSString *alertViewText) {
         if ([alertViewText isEqual:@"password"]) {
             %orig;
@@ -65,8 +153,30 @@
         }
       }];
    } else {
-      %orig;
+      if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
+         LAContext *laContext = [[LAContext alloc]init];
+
+         [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
+                     localizedReason:@"authenticate to open app" 
+                     reply:^(BOOL success, NSError * _Nullable error) {
+                        if (success) {
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                              dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.75 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                                 %orig;
+                              });
+                           });
+                           
+                        } else {
+                           //touch id failed to show
+                        }
+         }];
+      } else {
+         //its not killer clown call or go battle guide just open it
+         %orig;
+      }
    }
+
+   
    
   
 
@@ -77,47 +187,42 @@
    */
 
    //sharedInstance is a class method %c allows me to get the class definition
-   SBUIController *SBVC = [%c(SBUIController) sharedInstance]; 
-   NSLog(@"%@", SBVC);
-   UIView *myView = [SBVC valueForKey:@"_contentView"];
-   [myView setBackgroundColor:[UIColor purpleColor]];
+   // SBUIController *SBVC = [%c(SBUIController) sharedInstance]; 
+   // NSLog(@"%@", SBVC);
+   // UIView *myView = [SBVC valueForKey:@"_contentView"];
+   // [myView setBackgroundColor:[UIColor purpleColor]];
 
-   UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleSingleTap)];
-    tapGesture.delegate = self;
-    [myView addGestureRecognizer:tapGesture];
+   // UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleSingleTap)];
+   //  tapGesture.delegate = self;
+   //  [myView addGestureRecognizer:tapGesture];
    
 }
 
-%new
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-   NSLog(@"gesture recog");
-   return true;
-}
 
-%new
--(void)handleSingleTap {
-   NSLog(@"its a single tap");
-}
+// %new
+// -(void)handleSingleTap {
+//    NSLog(@"its a single tap");
+// }
 
 %end
 
-%hook SBPowerDownController 
+// %hook SBPowerDownController 
 
--(void)orderFront {
-    %log(@"called the orderFront method");
-    NSLog(@"called the orderFront method");
-    UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"LockApps" message:@"YOUR_PASSWORD" delegate:nil cancelButtonTitle:@"CONTINUE" otherButtonTitles:@"CANCEL", nil];
-    alert.delegate = self;
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    UITextField *alertTextField = [alert textFieldAtIndex:0];
-    alertTextField.keyboardType = UIKeyboardTypeDefault;
-//    alertTextField.secureTextEntry = YES;
-    alertTextField.placeholder = @"ENTER_PASSWORD";
-    [alert show];
-}
+// -(void)orderFront {
+//     %log(@"called the orderFront method");
+//     NSLog(@"called the orderFront method");
+//     UIAlertView * alert = [[UIAlertView alloc] initWithTitle:@"LockApps" message:@"YOUR_PASSWORD" delegate:nil cancelButtonTitle:@"CONTINUE" otherButtonTitles:@"CANCEL", nil];
+//     alert.delegate = self;
+//     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+//     UITextField *alertTextField = [alert textFieldAtIndex:0];
+//     alertTextField.keyboardType = UIKeyboardTypeDefault;
+// //    alertTextField.secureTextEntry = YES;
+//     alertTextField.placeholder = @"ENTER_PASSWORD";
+//     [alert show];
+// }
 
 
-%end
+// %end
 
  //you can add commas to %init to init more classes
  %ctor {
@@ -126,12 +231,15 @@
         
    //   );
 
-   NSArray<LSApplicationProxy*> *appProxyArray = [[LSApplicationWorkspace defaultWorkspace] allInstalledApplications];
-   
-   for (LSApplicationProxy *appProxy in appProxyArray) {
-      NSLog(@"from appProxy array: %@", [appProxy applicationIdentifier]);
-      NSLog(@"is a user application: %@", [appProxy atl_isUserApplication] ? @"true":@"false");
-   }
+   // NSArray<LSApplicationProxy*> *appProxyArray = [[LSApplicationWorkspace defaultWorkspace] allInstalledApplications];
+   NSArray<LSApplicationProxy*>* allInstalledApplications = [[LSApplicationWorkspace defaultWorkspace] atl_allInstalledApplications];
+   NSLog(@"the appProxyArray: %@",allInstalledApplications);
+
+//this sometimes causes the iphone to go into safe mode
+   // for (LSApplicationProxy *appProxy in allInstalledApplications) {
+   //    NSLog(@"from appProxy array: %@", [appProxy applicationIdentifier]);
+   //    NSLog(@"is a user application: %@", [appProxy atl_isUserApplication] ? @"true":@"false");
+   // }
  }
 
 

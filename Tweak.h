@@ -3,7 +3,29 @@
 #import "ButtonClass.h"
 // #import <AltList/AltList.h>
 #import <AltList/LSApplicationProxy+AltList.h>
-#import "Tweak.h"
+// #import <MobileCoreServices/LSApplicationWorkspace.h> ios 12 uses MobileCoreServices
+#import <MobileCoreServices/LSApplicationWorkspace.h> //ios 15 uses CoreServices in public frameworks
+#import <LocalAuthentication/LocalAuthentication.h>
+
+@interface SBIconView: UIView
+-(BOOL)gestureRecognizerShouldBegin:(id)arg1;
+@end
+
+@interface SpringBoard
++ (id)sharedInstance;
+- (void)_simulateHomeButtonPress;
+@end
+
+
+@interface SBIconImageView: UIView 
+
+@end
+
+@interface SBApplicationController : NSObject
+- (id)_lock_applicationWithBundleIdentifier:(id)arg1;
+- (id)allApplications;
+-(BOOL)scheduler:(id)arg1 requestsApplicationLaunch:(id)arg2;
+@end
 
 @interface SBHomeScreenBackdropViewBase: UIView
 @end
