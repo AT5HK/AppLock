@@ -4,33 +4,114 @@
 
 static PasswordManager *passwordManager;
 
+%hook SearchUIHomeScreenAppIconView
+// - (void)iconTapped:(id)arg1 {
+//    %log(@"iconTapped");
+// }
 
-%hook SBMainWorkspace
--(void)applicationProcessWillLaunch:(id)arg1 {
-   %log;
-   %orig;
-}
+// -(void)launchIcon {
+//    %log;
+// }
 
--(id)createRequestForApplicationActivation:(id)arg1 options:(unsigned long long)arg2 {
-   // [passwordManager checkBiometrics: withCompletion:^(BOOL isBiometricsCorrect, error) {
+- (void)icon:(id)arg1 launchFromLocation:(id)arg2 context:(id)arg3 {
+   // [passwordManager checkBiometrics:^(BOOL isBiometricsCorrect, NSError *error) {
    //    if (isBiometricsCorrect == true) {
-   //       return %orig;
+   //       %orig;
    //    } else {
    //       //do nothing, don't open the app
-   //       return nil
    //    }
-   // }];
+   //    }];
+
+      [passwordManager checkPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+      if (isPasswordCorrect == true) {
+         %orig;
+      } else {
+         //do nothing, don't open the app
+      }
+   }];
 }
 
--(void)systemService:(id)arg1 handleOpenApplicationRequest:(id)arg2 withCompletion:(/*^block*/id)arg3 {
-   %log;
-   %orig;
+%end
+
+// %hook SearchUICollectionViewController
+
+// - (void)collectionView:(id)arg1 didSelectItemAtIndexPath:(id)arg2 {
+//    NSLog(@"selected cell");
+//    %log;
+// }
+
+// -(void)viewDidLoad {
+//    %orig;
+//    %log(@"logged from: SearchUIResultsCollectionViewController "); 
+// }
+// %end
+
+// %hook SearchUIResultsCollectionViewController
+// -(void)viewDidLoad {
+//    %orig;
+//    self.view.backgroundColor = UIColor.blueColor;
+//    %log(@"logged from: SearchUIResultsCollectionViewController "); 
+// }
+
+// - (id)init {
+//    %log(@"logged from init method of:SearchUIResultsCollectionViewController ");
+//    return %orig;
+// }
+
+// - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+//    NSLog(@"selected cell");
+// }
+// %end
+
+// %hook SearchUIMultiResultCollectionView
+// - (id)initWithFrame:(struct CGRect)arg1 collectionViewLayout:(id)arg2 {
+//    %log(@"logged from: SearchUIMultiResultCollectionView ");
+//    return %orig;
+
+// }
+// -(void)viewDidLoad {
+//    %log(@"logged from: SearchUIMultiResultCollectionView ");
+//    %orig;
+// }
+// - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+//    NSLog(@"selected cell");
+//    %log;
+// }
+// %end
+
+
+%hook SBMainWorkspace
+// -(void)applicationProcessWillLaunch:(id)arg1 {
+//    %log;
+//    %orig;
+// }
+
+-(id)createRequestForApplicationActivation:(id)arg1 options:(unsigned long long)arg2 {
+
+   // dispatch_sync(dispatch_get_main_queue(), ^{
+   //    id __block r;
+   //    [passwordManager checkBiometrics:^(BOOL isBiometricsCorrect, NSError *error) {
+   //    if (isBiometricsCorrect == true) {
+   //       r = %orig;
+   //    } else {
+   //       //do nothing, don't open the app
+   //       r = nil; 
+   //    }
+   //    }];
+   //    return r;
+   // });
+   return %orig;
 }
 
--(void)systemService:(id)arg1 canActivateApplication:(id)arg2 withResult:(/*^block*/id)arg3 {
-   %log;
-   %orig;
-}
+// -(void)systemService:(id)arg1 handleOpenApplicationRequest:(id)arg2 withCompletion:(/*^block*/id)arg3 {
+//    %log;
+//    %orig;
+// }
+
+// -(void)systemService:(id)arg1 canActivateApplication:(id)arg2 withResult:(/*^block*/id)arg3 {
+//    %log;
+//    %orig;
+// }
 
 %end
 

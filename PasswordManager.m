@@ -11,16 +11,16 @@
     return sharedInstance;
 }
 
-// -(void)checkBiometrics withCompletion:(void(^)(BOOL isBiometricsCorrect, NSError * _Nullable error))completion {
-//     LAContext *laContext = [[LAContext alloc]init];
+-(void)checkBiometrics:(void(^)(BOOL isBiometricsCorrect, NSError *error))completion {
+    LAContext *laContext = [[LAContext alloc]init];
 
-//     [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
-//                 localizedReason:@"authenticate to open app" 
-//                 reply:^(BOOL success, NSError * _Nullable error) {
+    [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
+                localizedReason:@"authenticate to open app" 
+                reply:^(BOOL success, NSError *error) {
                 
-//                 completion(success, error);
-//     }];
-// }
+                completion(success, error);
+    }];
+}
 
 
 -(void)checkPassword:(NSString *)password withCompletion:(void(^)(BOOL isPasswordCorrect))completion {

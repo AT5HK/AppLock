@@ -8,6 +8,10 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "PasswordManager.h"
 
+@interface SearchUIResultsCollectionViewController: UICollectionViewController
+
+@end
+
 @interface UIApplication (private)
 -(void)launchApplicationWithIdentifier:(NSString *)arg1 suspended:(BOOL)arg2;
 @end
