@@ -6,6 +6,11 @@
 // #import <MobileCoreServices/LSApplicationWorkspace.h> ios 12 uses MobileCoreServices
 #import <MobileCoreServices/LSApplicationWorkspace.h> //ios 15 uses CoreServices in public frameworks
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "PasswordManager.h"
+
+@interface UIApplication (private)
+-(void)launchApplicationWithIdentifier:(NSString *)arg1 suspended:(BOOL)arg2;
+@end
 
 @interface SBIconView: UIView
 -(BOOL)gestureRecognizerShouldBegin:(id)arg1;
@@ -52,6 +57,7 @@
 
 @interface SBApplication
 @property (nonatomic,readonly) NSString * bundleIdentifier;
+-(BOOL)icon:(id)arg1 launchFromLocation:(id)arg2 context:(id)arg3 ;
 @end
 
 @interface SBWindow
