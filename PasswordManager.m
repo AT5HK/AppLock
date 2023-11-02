@@ -17,13 +17,12 @@
     [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
                 localizedReason:@"authenticate to open app" 
                 reply:^(BOOL success, NSError *error) {
-                
                 completion(success, error);
     }];
 }
 
 
--(void)checkPassword:(NSString *)password withCompletion:(void(^)(BOOL isPasswordCorrect))completion {
+-(void)checkForPassword:(NSString *)password withCompletion:(void(^)(BOOL isPasswordCorrect))completion {
    UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
 
     [self showAlertControllerPasswordCheckerWithVC:rootVC withCompletion:^(UIAlertController *alertController) {

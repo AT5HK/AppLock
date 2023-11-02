@@ -4,6 +4,53 @@
 
 static PasswordManager *passwordManager;
 
+%hook APUIAppIconGridView
+   -(void)iconTapped:(id)arg1 {
+      %log(@"iconTapped: %@", arg1);
+      %orig;
+   }
+
+   // -(id)bundleIdAtLocation:(CGPoint)arg1 {
+   //    %log(@"bundleIdAtLocation: %@", NSStringFromCGPoint(arg1));
+   //    return %orig;
+   // }
+
+   // -(BOOL)appIconDataSource:(id)arg1 launchAppFromIcon:(id)arg2 {
+   //    return %orig;
+   // }
+
+%end
+
+// %hook SBIcon
+// -(void)launchFromLocation:(id)arg1 context:(id)arg2 {
+//    NSLog(@"launchFromLocation: %@", arg1);
+//    %log;
+//    %orig;
+// }
+
+// %end
+
+// %hook SpringBoard
+// - (BOOL)launchApplicationWithIdentifier:(id)arg1 suspended:(_Bool)arg2 {
+//    %log(@"called launchApplicationWithIdentifier: %@", arg1);
+//    return %orig;
+// }
+// %end
+
+// %hook SBUserAgent
+// -(BOOL)canLaunchFromSource:(int)arg1 withURL:(id)arg2 bundleID:(id)arg3 {
+//    %log(@"called canLaunchFromSource: %@", arg3);
+//    return %orig;
+// }
+// %end
+
+// %hook SBStarkIconController
+// - (BOOL)icon:(id)arg1 launchFromLocation:(long long)arg2 context:(id)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
+//    %log(@"called canLaunchFromSource: %@", arg3);
+//    return %orig;
+// }
+// %end
+
 %hook SearchUIHomeScreenAppIconView
 // - (void)iconTapped:(id)arg1 {
 //    %log(@"iconTapped");
@@ -14,15 +61,7 @@ static PasswordManager *passwordManager;
 // }
 
 - (void)icon:(id)arg1 launchFromLocation:(id)arg2 context:(id)arg3 {
-   // [passwordManager checkBiometrics:^(BOOL isBiometricsCorrect, NSError *error) {
-   //    if (isBiometricsCorrect == true) {
-   //       %orig;
-   //    } else {
-   //       //do nothing, don't open the app
-   //    }
-   //    }];
-
-      [passwordManager checkPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+      [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
       if (isPasswordCorrect == true) {
          %orig;
       } else {
@@ -33,75 +72,30 @@ static PasswordManager *passwordManager;
 
 %end
 
-// %hook SearchUICollectionViewController
 
-// - (void)collectionView:(id)arg1 didSelectItemAtIndexPath:(id)arg2 {
-//    NSLog(@"selected cell");
-//    %log;
+
+// %hook SBMainWorkspace
+// // -(void)applicationProcessWillLaunch:(id)arg1 {
+// //    %log;
+// //    %orig;
+// // }
+
+// -(id)createRequestForApplicationActivation:(id)arg1 options:(unsigned long long)arg2 {
+//    //laContext to authenticate via touch id also calls this method
+//    // and it seems semaphore needed to wait for the block and then return the orginal function is causing the function
+//    //to stall, it is not called a second time.
+
+//    SBDeviceApplicationSceneEntity *sceneEntity = (SBDeviceApplicationSceneEntity*)arg1;
+//    NSString *bundleIdentifier = [sceneEntity valueForKey:@"_identifier"];
+//    NSLog(@"the bundleIdentifier: %@", bundleIdentifier);
+//    // NSLog(@"the sceneEntity.uniqueIdentifier: %@", sceneEntity.uniqueIdentifier);
+   
+
+   
+     
+//     %log(@"called: createRequestForApplicationActivation");
+//     return %orig;
 // }
-
-// -(void)viewDidLoad {
-//    %orig;
-//    %log(@"logged from: SearchUIResultsCollectionViewController "); 
-// }
-// %end
-
-// %hook SearchUIResultsCollectionViewController
-// -(void)viewDidLoad {
-//    %orig;
-//    self.view.backgroundColor = UIColor.blueColor;
-//    %log(@"logged from: SearchUIResultsCollectionViewController "); 
-// }
-
-// - (id)init {
-//    %log(@"logged from init method of:SearchUIResultsCollectionViewController ");
-//    return %orig;
-// }
-
-// - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-//    NSLog(@"selected cell");
-// }
-// %end
-
-// %hook SearchUIMultiResultCollectionView
-// - (id)initWithFrame:(struct CGRect)arg1 collectionViewLayout:(id)arg2 {
-//    %log(@"logged from: SearchUIMultiResultCollectionView ");
-//    return %orig;
-
-// }
-// -(void)viewDidLoad {
-//    %log(@"logged from: SearchUIMultiResultCollectionView ");
-//    %orig;
-// }
-// - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-//    NSLog(@"selected cell");
-//    %log;
-// }
-// %end
-
-
-%hook SBMainWorkspace
-// -(void)applicationProcessWillLaunch:(id)arg1 {
-//    %log;
-//    %orig;
-// }
-
--(id)createRequestForApplicationActivation:(id)arg1 options:(unsigned long long)arg2 {
-
-   // dispatch_sync(dispatch_get_main_queue(), ^{
-   //    id __block r;
-   //    [passwordManager checkBiometrics:^(BOOL isBiometricsCorrect, NSError *error) {
-   //    if (isBiometricsCorrect == true) {
-   //       r = %orig;
-   //    } else {
-   //       //do nothing, don't open the app
-   //       r = nil; 
-   //    }
-   //    }];
-   //    return r;
-   // });
-   return %orig;
-}
 
 // -(void)systemService:(id)arg1 handleOpenApplicationRequest:(id)arg2 withCompletion:(/*^block*/id)arg3 {
 //    %log;
@@ -113,7 +107,7 @@ static PasswordManager *passwordManager;
 //    %orig;
 // }
 
-%end
+// %end
 
 // %hook FBProcess 
 // -(void)_launchDidComplete:(BOOL)arg1 finalizeBlock:(/*^block*/id)arg2 {
@@ -297,58 +291,43 @@ static PasswordManager *passwordManager;
 %hook SBUIController
 
 -(void)activateApplication:(id)arg1 fromIcon:(id)arg2 location:(long long)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
-   // SBHomeScreenBackdropViewBase *homeScreenBackdrop = [((SBUIController*)self) valueForKey:@"_homeScreenBackdropView"];
-   // [homeScreenBackdrop setBackgroundColor:[UIColor redColor]];
 
    NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
    SBApplication *SBApp = arg1;
    NSString *bundleID = SBApp.bundleIdentifier;
    NSLog(@"the bundleID: %@", bundleID);
-
-   [passwordManager checkPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
+   [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
       if (isPasswordCorrect == true) {
          %orig;
       } else {
          //do nothing, don't open the app
       }
    }];
-   
+} else {
+   %orig;
+}
 
+// if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
+//    LAContext *laContext = [[LAContext alloc]init];
 
-   // if ([bundleID isEqual:@"com.zhiliaoapp.musically"]) {
-   //    SBHomeScreenWindow *homeScreenWindow = [self valueForKey:@"_window"];
-   //    SBHomeScreenViewController *homeScreenVC = homeScreenWindow.homeScreenViewController;
-
-   //    [homeScreenVC showAlertControllerPasswordChecker:^(NSString *alertViewText) {
-   //      if ([alertViewText isEqual:@"password"]) {
-   //          %orig;
-   //      } else {
-   //          //wrong password do nothing
-   //      }
-   //    }];
-   // } else {
-   //    if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
-   //       LAContext *laContext = [[LAContext alloc]init];
-
-   //       [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
-   //                   localizedReason:@"authenticate to open app" 
-   //                   reply:^(BOOL success, NSError * _Nullable error) {
-   //                      if (success) {
-   //                         dispatch_async(dispatch_get_main_queue(), ^{
-   //                            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.75 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-   //                               %orig;
-   //                            });
-   //                         });
-                           
-   //                      } else {
-   //                         //touch id failed to show
-   //                      }
-   //       }];
-   //    } else {
-   //       //its not killer clown call or go battle guide just open it
-   //       %orig;
-   //    }
-   // }
+//    [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
+//                localizedReason:@"authenticate to open app" 
+//                reply:^(BOOL success, NSError * _Nullable error) {
+//                   if (success) {
+//                      dispatch_async(dispatch_get_main_queue(), ^{
+//                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.75 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+//                            %orig;
+//                         });
+//                      });
+                     
+//                   } else {
+//                      //touch id failed to show
+//                   }
+//    }];
+// } else {
+//    %orig;
+// }
 
    
    
