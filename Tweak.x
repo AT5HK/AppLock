@@ -4,9 +4,31 @@
 
 static PasswordManager *passwordManager;
 
+
+NSArray* updateEnabledBundleIDs() {
+   NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs"];
+   NSArray *enabledBundleIDs = bundleDefaults[@"isEnabled"];
+   NSLog(@"the enabled bundle ids: %@", enabledBundleIDs);
+   // NSLog(@"enabled apps: %@", [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs"][@"isEnabled"]);
+   return enabledBundleIDs;
+}
+
+BOOL isAppLockEnabled() {
+   NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+   NSNumber *isEnabled = bundleDefaults[@"isTweakEnabled"];
+   return [isEnabled boolValue];
+}
+
+static void appLockSetup() {
+   passwordManager = [PasswordManager sharedInstance];
+}
+
 %hook APUIAppIconGridView
    -(void)iconTapped:(id)arg1 {
+      if (isAppLockEnabled() == false) { %orig; return; } //run the original method and exit hooked method before
       %log(@"iconTapped: %@", arg1);
+      
+
       %orig;
    }
 
@@ -61,7 +83,13 @@ static PasswordManager *passwordManager;
 // }
 
 - (void)icon:(id)arg1 launchFromLocation:(id)arg2 context:(id)arg3 {
-      [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+   BOOL tweakEnabled = isAppLockEnabled();
+   NSLog(@"is applocked enabled: %d", tweakEnabled);
+   if (tweakEnabled == false) {
+      %orig;
+      return;
+   }
+   [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
       if (isPasswordCorrect == true) {
          %orig;
       } else {
@@ -249,6 +277,12 @@ static PasswordManager *passwordManager;
 -(void)viewDidLoad {
    %log(@"called from SBHomeScreenViewController viewdidload");
 
+   // [[NSNotificationCenter defaultCenter] 
+   //                                     addObserver:self 
+   //                                     selector:@selector(updateEnabledBundleIDs) 
+   //                                     name:NSUserDefaultsDidChangeNotification 
+   //                                     object:nil];
+
    ButtonClass *buttonClass = [[ButtonClass alloc]init];
    UIButton *greenButton = [buttonClass createButton];
    [greenButton addTarget:self action:@selector(buttonAction) forControlEvents:UIControlEventTouchUpInside];
@@ -282,8 +316,11 @@ static PasswordManager *passwordManager;
 %new
 -(void)buttonAction {
    NSLog(@"yellow button action");
+   NSLog(@"test log");
    // [[objc_getClass("SpringBoard") sharedInstance] _simulateHomeButtonPress];
-   [UIApplication.sharedApplication launchApplicationWithIdentifier:@"com.asolo.Jailbreak-Detection" suspended:false];
+   // [UIApplication.sharedApplication launchApplicationWithIdentifier:@"com.asolo.Jailbreak-Detection" suspended:false];
+   // updateEnabledBundleIDs(); 
+   NSLog(@"is tweak enabled: %@", isAppLockEnabled() ? @"yes" : @"no");
 }
 
 %end
@@ -291,12 +328,20 @@ static PasswordManager *passwordManager;
 %hook SBUIController
 
 -(void)activateApplication:(id)arg1 fromIcon:(id)arg2 location:(long long)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
+   BOOL tweakEnabled = isAppLockEnabled();
+   NSLog(@"is applocked enabled: %d", tweakEnabled);
+   if (tweakEnabled == false) {
+      %orig;
+      return;
+   }
+   
+   NSArray *enabledBundleIDs = updateEnabledBundleIDs();
 
-   NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
+   // NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
    SBApplication *SBApp = arg1;
    NSString *bundleID = SBApp.bundleIdentifier;
    NSLog(@"the bundleID: %@", bundleID);
-if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
+if ([enabledBundleIDs containsObject:bundleID] == true) {
    [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
       if (isPasswordCorrect == true) {
          %orig;
@@ -359,15 +404,13 @@ if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
 
 %end
 
-static void appLockSetup() {
-   passwordManager = [PasswordManager sharedInstance];
-}
 
 
 
  //you can add commas to %init to init more classes
  %ctor {
    appLockSetup();
+
 	// %init(
    //      //ViewController=objc_getClass("KillerClownCall.ViewController")
         

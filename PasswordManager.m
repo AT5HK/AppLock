@@ -11,6 +11,8 @@
     return sharedInstance;
 }
 
+// -(void)authenticate
+
 -(void)checkBiometrics:(void(^)(BOOL isBiometricsCorrect, NSError *error))completion {
     LAContext *laContext = [[LAContext alloc]init];
 

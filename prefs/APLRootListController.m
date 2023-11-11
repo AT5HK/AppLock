@@ -3,34 +3,44 @@
 // @import Preferences.PSSpecifier;
 #import <Preferences/Preferences.h>
 
-
+static PSSpecifier* tweakEnabledSpecifier;
 
 
 @implementation APLRootListController
 
 
 
-// - (NSArray *)specifiers {
-// 	if (!_specifiers) {
-// 		_specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
-// 	}
-// 	// for (int i = 0; i < _specifiers.count -1; i++) {
-// 	// 	NSLog(@"cell preferences: %@", [self readPreferenceValue:_specifiers[i]]);
-// 	// }
-// 	PSSpecifier* testSpecifier = [PSSpecifier preferenceSpecifierNamed:@"test"
-// 									    target:self
-// 									       set:NULL
-// 									       get:NULL
-// 									    detail:Nil
-// 									      cell:PSSwitchCell
-// 									      edit:Nil];
-// 	// testSpecifier.value = true;
-// 	testSpecifier.name = @"generated specifier cell";
-// 	[testSpecifier setProperty:@YES forKey:@"enabled"];
-// 	[testSpecifier setProperty:@"0" forKey:@"default"];
-// 	[_specifiers addObject: testSpecifier];
-// 	return _specifiers;
-// }
+- (NSMutableArray *)specifiers {
+	
+	_specifiers = [super specifiers]; //call super method to add all app specefiers via altlist
+
+	NSLog(@"_specifiers array before: %@", _specifiers);
+	NSUInteger containsTweakEnabledSpecifier = [_specifiers indexOfObjectIdenticalTo:tweakEnabledSpecifier];
+	if (containsTweakEnabledSpecifier == NSNotFound) {
+		[_specifiers insertObject:tweakEnabledSpecifier atIndex:0]; 
+	}
+
+	NSLog(@"_specifiers array after: %@", _specifiers);
+	
+	// NSLog(@"specefiers method called: %p, is in _specefiers array: %lu", &tweakEnabledSpecifier, containsTweakEnabledSpecifier);
+	return _specifiers;
+}
+
+-(void)viewDidLoad {
+	tweakEnabledSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Enabled"
+									target:self
+									set:@selector(setPreferenceValue:specifier:)
+									get:@selector(readPreferenceValue:)
+									detail:Nil
+									cell:PSSwitchCell
+									edit:Nil];
+	[tweakEnabledSpecifier setProperty:@NO forKey:@"enabled"];
+	[tweakEnabledSpecifier setProperty:@"com.applock.prefs.isTweakOn" forKey:@"defaults"];
+	[tweakEnabledSpecifier setProperty:@"isTweakEnabled" forKey:@"key"];
+	// [tweakEnabledSpecifier setProperty:@"tweakEnabledSpecifier" forKey:@"PostNotification"];
+	[super viewDidLoad];
+	
+}
 
 
 //MARK: helper methods

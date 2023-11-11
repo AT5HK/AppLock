@@ -8,6 +8,7 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "PasswordManager.h"
 
+
 @interface SBDeviceApplicationSceneEntity : NSObject
 @property (nonatomic,copy,readonly) NSString * uniqueIdentifier; 
 @end

@@ -16,6 +16,27 @@
 		<true/>
 		<key>label</key>
 		<string>Prefs</string>
+		<key>defaults</key>
+		<string>com.applock.prefs</string>
+		<key>key</key>
+		<string>isEnabled</string>
+		<key>sections</key>
+		<array>
+			<dict>
+				<key>sectionType</key>
+				<string>Visible</string>
+			</dict>
+			<dict>
+				<key>sectionType</key>
+				<string>Hidden</string>
+			</dict>
+		</array>
+		<key>showIdentifiersAsSubtitle</key>
+		<true/>
+		<key>defaultApplicationSwitchValue</key>
+		<false/>
+		<key>useSearchBar</key>
+		<true/>
 	</dict>
 </dict>
 </plist>
