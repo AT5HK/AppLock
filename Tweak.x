@@ -327,21 +327,21 @@ static void appLockSetup() {
 
 %hook SBUIController
 
--(void)activateApplication:(id)arg1 fromIcon:(id)arg2 location:(long long)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
-   BOOL tweakEnabled = isAppLockEnabled();
-   NSLog(@"is applocked enabled: %d", tweakEnabled);
-   if (tweakEnabled == false) {
-      %orig;
-      return;
-   }
+-(void)activateApplication:(SBApplication *)application fromIcon:(id)arg2 location:(long long)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
    
-   NSArray *enabledBundleIDs = updateEnabledBundleIDs();
+   //check if AppLock tweak is enabled, if not run original method and exit hooked method
+   if (isAppLockEnabled() == false) { %orig; return; } 
+   
+   
+   NSString *bundleID = application.bundleIdentifier;
+   NSLog(@"the bundleID: %@", bundleID);
+   NSArray *lockedBundleIDs = updateEnabledBundleIDs();
+   BOOL isApplicationLocked = [lockedBundleIDs containsObject:bundleID];
+
+   //check if app has been locked, if not run original method and exit hooked method
+   if (isApplicationLocked == false) { %orig; return; }
 
    // NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
-   SBApplication *SBApp = arg1;
-   NSString *bundleID = SBApp.bundleIdentifier;
-   NSLog(@"the bundleID: %@", bundleID);
-if ([enabledBundleIDs containsObject:bundleID] == true) {
    [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
       if (isPasswordCorrect == true) {
          %orig;
@@ -349,30 +349,8 @@ if ([enabledBundleIDs containsObject:bundleID] == true) {
          //do nothing, don't open the app
       }
    }];
-} else {
-   %orig;
-}
 
-// if ([bundleID isEqual:@"com.asolo.Jailbreak-Detection"]) {
-//    LAContext *laContext = [[LAContext alloc]init];
 
-//    [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
-//                localizedReason:@"authenticate to open app" 
-//                reply:^(BOOL success, NSError * _Nullable error) {
-//                   if (success) {
-//                      dispatch_async(dispatch_get_main_queue(), ^{
-//                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.75 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-//                            %orig;
-//                         });
-//                      });
-                     
-//                   } else {
-//                      //touch id failed to show
-//                   }
-//    }];
-// } else {
-//    %orig;
-// }
 
    
    

@@ -11,7 +11,12 @@
     return sharedInstance;
 }
 
-// -(void)authenticate
+-(void)authenticate:(void(^)(BOOL isAuthenticated, NSError *error))completion {
+    NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+	NSLog(@"current bundleDefaults: %@", bundleDefaults);
+
+    
+}
 
 -(void)checkBiometrics:(void(^)(BOOL isBiometricsCorrect, NSError *error))completion {
     LAContext *laContext = [[LAContext alloc]init];

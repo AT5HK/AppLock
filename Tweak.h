@@ -7,7 +7,7 @@
 #import <MobileCoreServices/LSApplicationWorkspace.h> //ios 15 uses CoreServices in public frameworks
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "PasswordManager.h"
-
+#import "Common.h"
 
 @interface SBDeviceApplicationSceneEntity : NSObject
 @property (nonatomic,copy,readonly) NSString * uniqueIdentifier; 
