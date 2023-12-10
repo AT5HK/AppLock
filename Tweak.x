@@ -342,8 +342,18 @@ static void appLockSetup() {
    if (isApplicationLocked == false) { %orig; return; }
 
    // NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
-   [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
-      if (isPasswordCorrect == true) {
+   // [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+   //    if (isPasswordCorrect == true) {
+   //       %orig;
+   //    } else {
+   //       //do nothing, don't open the app
+   //    }
+   // }];
+
+   // authenticate:(void(^)(BOOL isAuthenticated, NSError *authenticationError))completion
+   [passwordManager authenticate:^(BOOL isAuthenticated, NSError *authenticationError) {
+      if (isAuthenticated == true) {
+         NSLog(@"passwordManager authenticate works");
          %orig;
       } else {
          //do nothing, don't open the app

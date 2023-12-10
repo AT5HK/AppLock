@@ -10,8 +10,8 @@ export TARGET := iphone:clang:16.4:7.0
 # THEOS_PACKAGE_SCHEME = rootlful
 THEOS_PACKAGE_SCHEME = rootless
 
-# INSTALL_TARGET_PROCESSES = SpringBoard
-INSTALL_TARGET_PROCESSES = Preferences
+INSTALL_TARGET_PROCESSES = SpringBoard
+# INSTALL_TARGET_PROCESSES = Preferences
 
 include $(THEOS)/makefiles/common.mk
 

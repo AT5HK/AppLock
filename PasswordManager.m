@@ -11,21 +11,48 @@
     return sharedInstance;
 }
 
--(void)authenticate:(void(^)(BOOL isAuthenticated, NSError *error))completion {
-    NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+-(void)authenticate:(void(^)(BOOL isAuthenticated, NSError *authenticationError))completion {
+    NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 
-    
+    BOOL isBiometricsEnabled = [bundleDefaults[BIOMETRICS_SPECIFIER_KEY] boolValue];
+    BOOL isPasscodeEnabled = [bundleDefaults[PASSCODE_SPECIFIER_KEY] boolValue];
+
+    if (isBiometricsEnabled == true) {
+        [self checkBiometrics:^(BOOL isBiometricsCorrect, NSError *checkError) {
+            if (isBiometricsCorrect == true) {
+                completion(isBiometricsCorrect, checkError);
+            }
+        }];
+    }
+
+    if (isPasscodeEnabled == true) {
+        [self checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+            if (isPasswordCorrect == true) {
+                completion(isPasswordCorrect, nil);
+            }
+        }];
+    }
+
 }
 
--(void)checkBiometrics:(void(^)(BOOL isBiometricsCorrect, NSError *error))completion {
+-(void)checkBiometrics:(void(^)(BOOL isBiometricsCorrect, NSError *checkError))completion {
     LAContext *laContext = [[LAContext alloc]init];
+    NSError *evaluatePolicyError;
 
-    [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
+    BOOL isBiometricsAvailable = [laContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&evaluatePolicyError];
+    if (isBiometricsAvailable == true) {
+        [laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
                 localizedReason:@"authenticate to open app" 
                 reply:^(BOOL success, NSError *error) {
                 completion(success, error);
-    }];
+        }];
+    } else {
+        UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+        [self showAlertControllerWithVC:rootVC];
+        //don't run completion biometrics is not availalbe
+        // completion(isBiometricsCorrect, nil); 
+    }
 }
 
 
@@ -62,6 +89,23 @@
    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.secureTextEntry = true;
     }];
+
+   [alert addAction:defaultAction];
+   [VC presentViewController:alert animated:YES completion:nil];
+}
+
+-(void)showAlertControllerWithVC:(UIViewController *)VC {
+   UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
+                               message:@"No Biometrics, please enabled FaceID or TouchID in settings."
+                               preferredStyle:UIAlertControllerStyleAlert];
+   
+   UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+      handler:^(UIAlertAction * action) 
+      {
+        
+      }];
+   
+   
 
    [alert addAction:defaultAction];
    [VC presentViewController:alert animated:YES completion:nil];
