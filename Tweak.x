@@ -14,8 +14,8 @@ NSArray* updateEnabledBundleIDs() {
 }
 
 BOOL isAppLockEnabled() {
-   NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
-   NSNumber *isEnabled = bundleDefaults[@"isTweakEnabled"];
+   NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
+   NSNumber *isEnabled = bundleDefaults[TWEAK_SPECIFIER_KEY];
    return [isEnabled boolValue];
 }
 

@@ -15,13 +15,12 @@
 // @end
 
 
-
+static NSDictionary *myBundleDefaults;
 
 static PSSpecifier *tweakEnabledSpecifier;
 static PSSpecifier *biometricsSpecifier;
 static PSSpecifier *passcodeSpecifier;
-// static UISwitch *biometricsSwitchControl;
-// static UISwitch *passcodeSwitchControl;
+
 
 UITableView *myTableView;
 
@@ -35,6 +34,7 @@ NSMutableArray *cellArray;
     if (self) {
         NSLog(@"init called successfully");
 		[self createCustomSpecifiers];
+		myBundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
     }
     return self;
 }
@@ -47,20 +47,20 @@ NSMutableArray *cellArray;
 void preferencesChanged() {
 	NSLog(@"preferencesChanged called");
 
-// 	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
-//     NSNumber *isBiometricsEnabled = bundleDefaults[@"isBiometricsEnabled"];
+// 	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
+//     NSNumber *isBiometricsEnabled = bundleDefaults[BIOMETRICS_SPECIFIER_KEY];
 
 //     PSSwitchTableCell *biometricsSwitchCell = [myTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
 // 	UISwitch *biometricsSwitchControl = (UISwitch*)biometricsSwitchCell.control;
    
 //    if ([isBiometricsEnabled boolValue] == true) {
-// 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isBiometricsEnabled":@0}
-//                     forName:@"com.applock.prefs.isTweakOn"];
+// 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{BIOMETRICS_SPECIFIER_KEY:@0}
+//                     forName:USER_DEFAULTS_DOMAIN];
 // 	[biometricsSwitchControl setOn:true animated:true];
 
 //    } else {
-// 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isBiometricsEnabled":@1}
-//                     forName:@"com.applock.prefs.isTweakOn"];
+// 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{BIOMETRICS_SPECIFIER_KEY:@1}
+//                     forName:USER_DEFAULTS_DOMAIN];
 // 	[biometricsSwitchControl setOn:false animated:true];
 //    }
 
@@ -79,8 +79,8 @@ void preferencesChanged() {
 									detail:Nil
 									cell:PSSwitchCell
 									edit:Nil];
-	[tweakEnabledSpecifier setProperty:@"com.applock.prefs.isTweakOn" forKey:@"defaults"];
-	[tweakEnabledSpecifier setProperty:@"isTweakEnabled" forKey:@"key"];
+	[tweakEnabledSpecifier setProperty:USER_DEFAULTS_DOMAIN forKey:@"defaults"];
+	[tweakEnabledSpecifier setProperty:TWEAK_SPECIFIER_KEY forKey:@"key"];
 	[biometricsSpecifier setProperty:@YES forKey:@"default"];
 	[tweakEnabledSpecifier setProperty:@"tweakEnabledSpecifier" forKey:@"PostNotification"];
 
@@ -92,8 +92,8 @@ void preferencesChanged() {
 									detail:Nil
 									cell:PSSwitchCell
 									edit:Nil];
-	[biometricsSpecifier setProperty:@"com.applock.prefs.isTweakOn" forKey:@"defaults"];
-	[biometricsSpecifier setProperty:@"isBiometricsEnabled" forKey:@"key"];
+	[biometricsSpecifier setProperty:USER_DEFAULTS_DOMAIN forKey:@"defaults"];
+	[biometricsSpecifier setProperty:BIOMETRICS_SPECIFIER_KEY forKey:@"key"];
 	[biometricsSpecifier setProperty:@YES forKey:@"default"];
 
 	passcodeSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Passcode"
@@ -103,8 +103,8 @@ void preferencesChanged() {
 									detail:Nil
 									cell:PSSwitchCell
 									edit:Nil];
-	[passcodeSpecifier setProperty:@"com.applock.prefs.isTweakOn" forKey:@"defaults"];
-	[passcodeSpecifier setProperty:@"isPasscodeEnabled" forKey:@"key"];
+	[passcodeSpecifier setProperty:USER_DEFAULTS_DOMAIN forKey:@"defaults"];
+	[passcodeSpecifier setProperty:PASSCODE_SPECIFIER_KEY forKey:@"key"];
 	[passcodeSpecifier setProperty:@NO forKey:@"default"];
 	
 
@@ -151,13 +151,27 @@ void preferencesChanged() {
 	myTableView = [self table];
 
 	NSLog(@"the tableView: %@", myTableView);
-	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 
 }
 
 
 //MARK: helper methods
+
+-(void)setupSwitchSettings {
+	//this runs after the PSListController settings and overrides it. I'm not sure what function is being used
+	//to save the settings of enabled,biometrics, passcode switches
+
+	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
+	NSLog(@"current bundleDefaults: %@", bundleDefaults);
+
+	// BOOL isTweakEnabled = bundleDefaults[TWEAK_SPECIFIER_KEY];
+	// BOOL isBiometricsEnabled = bundleDefaults[BIOMETRICS_SPECIFIER_KEY];
+	// BOOL isPasscodeEnabled = bundleDefaults[PASSCODE_SPECIFIER_KEY];
+
+
+}
 
 -(void)isEnabledSwitchChanged:(id)sender {
 	NSLog(@"isEnabledSwitchChanged action called");
@@ -171,22 +185,22 @@ void preferencesChanged() {
 	UISwitch *passcodeSwitchControl = (UISwitch*)[passcodeSwitchCell control];
 
    if (isEnabledSwitch.on == true) {
-	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isTweakEnabled":@1,
-																@"isBiometricsEnabled":@1, 
-																@"isPasscodeEnabled":@0}
-													forName:@"com.applock.prefs.isTweakOn"];
+	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@1,
+																BIOMETRICS_SPECIFIER_KEY:@1, 
+																PASSCODE_SPECIFIER_KEY:@0}
+													forName:USER_DEFAULTS_DOMAIN];
 	[biometricsSwitchControl setOn:true animated:true]; //set biometrics on by default
 	[passcodeSwitchControl setOn:false animated:true];
    } else {
-	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isTweakEnabled":@0,
-																@"isBiometricsEnabled":@0, 
-																@"isPasscodeEnabled":@0}
-													forName:@"com.applock.prefs.isTweakOn"];
+	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@0,
+																BIOMETRICS_SPECIFIER_KEY:@0, 
+																PASSCODE_SPECIFIER_KEY:@0}
+													forName:USER_DEFAULTS_DOMAIN];
 	[passcodeSwitchControl setOn:false animated:true];
 	[biometricsSwitchControl setOn:false animated:true];
    }
 
-	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 	
 }
@@ -199,17 +213,17 @@ void preferencesChanged() {
 	UISwitch *passcodeSwitchControl = (UISwitch*)[passcodeSwitchCell control];
    
    if (biomentricsSwitch.on == true) {
-	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isTweakEnabled":@1,
-																@"isBiometricsEnabled":@1, 
-																@"isPasscodeEnabled":@0}
-                   							 forName:@"com.applock.prefs.isTweakOn"];
+	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@1,
+																BIOMETRICS_SPECIFIER_KEY:@1, 
+																PASSCODE_SPECIFIER_KEY:@0}
+                   							 forName:USER_DEFAULTS_DOMAIN];
 	[passcodeSwitchControl setOn:false animated:true];
 
    } else {
-	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isTweakEnabled":@1, 
-																@"isBiometricsEnabled":@0, 
-																@"isPasscodeEnabled":@1}
-                    						forName:@"com.applock.prefs.isTweakOn"];
+	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@1, 
+																BIOMETRICS_SPECIFIER_KEY:@0, 
+																PASSCODE_SPECIFIER_KEY:@1}
+                    						forName:USER_DEFAULTS_DOMAIN];
 	[passcodeSwitchControl setOn:true animated:true];
    }
 
@@ -218,7 +232,7 @@ void preferencesChanged() {
 	UISwitch *isEnabledSwitchControl = (UISwitch*)[isEnabledSwitchCell control];
 	[isEnabledSwitchControl setOn:true animated:true];
 
-	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 }
 
@@ -231,17 +245,17 @@ void preferencesChanged() {
 	UISwitch *biometricsSwitchControl = (UISwitch*)[biometricsSwitchCell control];
    
    if (passcodeSwitch.on == true) {
-	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isTweakEnabled":@1,
-																@"isBiometricsEnabled":@0, 
-																@"isPasscodeEnabled":@1}
-                   							 forName:@"com.applock.prefs.isTweakOn"];
+	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@1,
+																BIOMETRICS_SPECIFIER_KEY:@0, 
+																PASSCODE_SPECIFIER_KEY:@1}
+                   							 forName:USER_DEFAULTS_DOMAIN];
 	[biometricsSwitchControl setOn:false animated:true];
 
    } else {
-	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{@"isTweakEnabled":@1, 
-																@"isBiometricsEnabled":@1, 
-																@"isPasscodeEnabled":@0}
-                    						forName:@"com.applock.prefs.isTweakOn"];
+	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@1, 
+																BIOMETRICS_SPECIFIER_KEY:@1, 
+																PASSCODE_SPECIFIER_KEY:@0}
+                    						forName:USER_DEFAULTS_DOMAIN];
 	[biometricsSwitchControl setOn:true animated:true];
    }
 
@@ -250,7 +264,7 @@ void preferencesChanged() {
 	UISwitch *isEnabledSwitchControl = (UISwitch*)[isEnabledSwitchCell control];
 	[isEnabledSwitchControl setOn:true animated:true];
 
-	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs.isTweakOn"];
+	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 }
 
@@ -275,6 +289,10 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 		[isEnabledSwitchControl addTarget:self 
 									action:@selector(isEnabledSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged]; 
+
+		// BOOL switchValue = myBundleDefaults[TWEAK_SPECIFIER_KEY];
+		// [isEnabledSwitchControl setOn:switchValue animated:false];
+
 	}
 
 	if ([indexPath compare:BIOMETRIC_CELL_INDEXPATH] == NSOrderedSame) {
@@ -284,6 +302,9 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 		[biometricsSwitchControl addTarget:self 
 									action:@selector(biometricsSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged]; 
+
+		// BOOL switchValue = myBundleDefaults[BIOMETRICS_SPECIFIER_KEY];
+		// [biometricsSwitchControl setOn:switchValue animated:false];
 	}
 
 	if ([indexPath compare:PASSCODE_CELL_INDEXPATH] == NSOrderedSame) {
@@ -292,19 +313,21 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 		UISwitch *passcodeSwitchControl = (UISwitch*)[passcodeSwitchCell control];
 		[passcodeSwitchControl addTarget:self 
 									action:@selector(passcodeSwitchChanged:) 
-							forControlEvents:UIControlEventValueChanged]; 
+							forControlEvents:UIControlEventValueChanged];
+
+		// BOOL switchValue = myBundleDefaults[PASSCODE_SPECIFIER_KEY];
+		// [passcodeSwitchControl setOn:switchValue animated:false]; 
 	}
 
 	
 }
 
 // -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-// 	// if (indexPath.row >= 3) {
-// 	// 	return nil;
-// 	// }
-// 	UITableViewCell *myCell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
-// 	[cellArray addObject: myCell];
-// 	NSLog(@"the indexPath: %@", indexPath);
+
+// 	PSSwitchTableCell *myCell = (PSSwitchTableCell*)[super tableView:tableView cellForRowAtIndexPath:indexPath];
+// 	UISwitch *switchControl = (UISwitch*)[myCell control];
+// 	NSLog(@"the cell: %@ and indexPath: %@, the UISwitch value: %d", myCell, indexPath, switchControl.on);
+	 
 // 	return myCell;
 // }
 
