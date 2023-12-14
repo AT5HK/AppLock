@@ -24,12 +24,28 @@ static void appLockSetup() {
 }
 
 %hook APUIAppIconGridView
-   -(void)iconTapped:(id)arg1 {
-      if (isAppLockEnabled() == false) { %orig; return; } //run the original method and exit hooked method before
-      %log(@"iconTapped: %@", arg1);
+   -(void)iconTapped:(SBIconView *)iconView {
+      %log();
+      //check if AppLock tweak is enabled, if not run original method and exit hooked method
+      if (isAppLockEnabled() == false) { %orig; return; } 
       
+      
+      NSString *bundleID = iconView.applicationBundleIdentifierForShortcuts;
+      NSLog(@"the bundleID: %@", bundleID);
+      NSArray *lockedBundleIDs = updateEnabledBundleIDs();
+      BOOL isApplicationLocked = [lockedBundleIDs containsObject:bundleID];
 
-      %orig;
+      // //check if app has been locked, if not run original method and exit hooked method
+      if (isApplicationLocked == false) { %orig; return; }
+
+      [passwordManager authenticate:^(BOOL isAuthenticated, NSError *authenticationError) {
+         if (isAuthenticated == true) {
+            NSLog(@"passwordManager authenticate works");
+            %orig;
+         } else {
+            //do nothing, don't open the app
+         }
+      }];
    }
 
    // -(id)bundleIdAtLocation:(CGPoint)arg1 {
@@ -82,15 +98,22 @@ static void appLockSetup() {
 //    %log;
 // }
 
-- (void)icon:(id)arg1 launchFromLocation:(id)arg2 context:(id)arg3 {
-   BOOL tweakEnabled = isAppLockEnabled();
-   NSLog(@"is applocked enabled: %d", tweakEnabled);
-   if (tweakEnabled == false) {
-      %orig;
-      return;
-   }
-   [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
-      if (isPasswordCorrect == true) {
+- (void)icon:(SBHApplicationIcon*)applicationIcon launchFromLocation:(id)arg2 context:(id)arg3 {
+   //check if AppLock tweak is enabled, if not run original method and exit hooked method
+   if (isAppLockEnabled() == false) { %orig; return; } 
+   
+   
+   NSString *bundleID = applicationIcon.applicationBundleID;
+   NSLog(@"the bundleID: %@", bundleID);
+   NSArray *lockedBundleIDs = updateEnabledBundleIDs();
+   BOOL isApplicationLocked = [lockedBundleIDs containsObject:bundleID];
+
+   // //check if app has been locked, if not run original method and exit hooked method
+   if (isApplicationLocked == false) { %orig; return; }
+
+   [passwordManager authenticate:^(BOOL isAuthenticated, NSError *authenticationError) {
+      if (isAuthenticated == true) {
+         NSLog(@"passwordManager authenticate works");
          %orig;
       } else {
          //do nothing, don't open the app
@@ -341,16 +364,6 @@ static void appLockSetup() {
    //check if app has been locked, if not run original method and exit hooked method
    if (isApplicationLocked == false) { %orig; return; }
 
-   // NSLog(@"what is arg1: %@, arg2: %@, arg3: %lld, arg4: %@, arg5: %@", arg1, arg2, arg3, arg4, arg5);
-   // [passwordManager checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
-   //    if (isPasswordCorrect == true) {
-   //       %orig;
-   //    } else {
-   //       //do nothing, don't open the app
-   //    }
-   // }];
-
-   // authenticate:(void(^)(BOOL isAuthenticated, NSError *authenticationError))completion
    [passwordManager authenticate:^(BOOL isAuthenticated, NSError *authenticationError) {
       if (isAuthenticated == true) {
          NSLog(@"passwordManager authenticate works");
@@ -359,28 +372,6 @@ static void appLockSetup() {
          //do nothing, don't open the app
       }
    }];
-
-
-
-   
-   
-  
-
-
-   /* 
-   can only reference SBUIController using %c even though I can see the header file
-    inside $theos/vendor/include, but i can reference SBApplication from here just fine
-   */
-
-   //sharedInstance is a class method %c allows me to get the class definition
-   // SBUIController *SBVC = [%c(SBUIController) sharedInstance]; 
-   // NSLog(@"%@", SBVC);
-   // UIView *myView = [SBVC valueForKey:@"_contentView"];
-   // [myView setBackgroundColor:[UIColor purpleColor]];
-
-   // UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleSingleTap)];
-   //  tapGesture.delegate = self;
-   //  [myView addGestureRecognizer:tapGesture];
    
 }
 

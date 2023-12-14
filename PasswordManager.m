@@ -15,6 +15,12 @@
     NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 
+    NSDictionary *bundleDefaultsPasscode = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.passcode"];
+	NSLog(@"current passcode: %@", bundleDefaultsPasscode);
+
+    NSString *appLockPasscode = bundleDefaultsPassword[@"passcode"];
+
+
     BOOL isBiometricsEnabled = [bundleDefaults[BIOMETRICS_SPECIFIER_KEY] boolValue];
     BOOL isPasscodeEnabled = [bundleDefaults[PASSCODE_SPECIFIER_KEY] boolValue];
 
@@ -27,7 +33,7 @@
     }
 
     if (isPasscodeEnabled == true) {
-        [self checkForPassword:@"password" withCompletion:^(BOOL isPasswordCorrect) {
+        [self checkForPassword:appLockPasscode withCompletion:^(BOOL isPasswordCorrect) {
             if (isPasswordCorrect == true) {
                 completion(isPasswordCorrect, nil);
             }

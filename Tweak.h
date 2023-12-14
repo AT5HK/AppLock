@@ -9,6 +9,10 @@
 #import "PasswordManager.h"
 #import "Common.h"
 
+@interface SBHApplicationIcon
+@property(readonly, copy, nonatomic) NSString *applicationBundleID;
+@end
+
 @interface SBDeviceApplicationSceneEntity : NSObject
 @property (nonatomic,copy,readonly) NSString * uniqueIdentifier; 
 @end
@@ -23,6 +27,8 @@
 
 @interface SBIconView: UIView
 -(BOOL)gestureRecognizerShouldBegin:(id)arg1;
+@property(readonly, copy, nonatomic) NSString *applicationBundleIdentifierForShortcuts;
+
 @end
 
 @interface SpringBoard

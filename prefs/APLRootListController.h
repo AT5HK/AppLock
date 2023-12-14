@@ -1,6 +1,8 @@
 #import <Preferences/PSListController.h>
 #import <AltList/AltList.h>
 #import "Common.h"
+#import "PasswordViewController.h"
+
 
 #define IS_ENABLED_CELL_INDEXPATH [NSIndexPath indexPathForRow:0 inSection:0]
 #define BIOMETRIC_CELL_INDEXPATH [NSIndexPath indexPathForRow:1 inSection:0]

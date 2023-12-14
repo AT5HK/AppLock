@@ -5,3 +5,6 @@
 #define TWEAK_SPECIFIER_KEY @"isTweakEnabled"
 #define BIOMETRICS_SPECIFIER_KEY @"isBiometricsEnabled"
 #define PASSCODE_SPECIFIER_KEY @"isPasscodeEnabled"
+
+#define SCREEN_WIDTH [ [ UIScreen mainScreen ] bounds ].size.width
+#define SCREEN_HEIGHT [ [ UIScreen mainScreen ] bounds ].size.height

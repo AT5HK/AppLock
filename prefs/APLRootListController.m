@@ -159,6 +159,13 @@ void preferencesChanged() {
 
 //MARK: helper methods
 
+-(void)presentPasswordViewController {
+	PasswordViewController *passwordVC = [[PasswordViewController alloc] init];
+
+
+	[self presentViewController:passwordVC animated:true completion:nil];
+}
+
 -(void)setupSwitchSettings {
 	//this runs after the PSListController settings and overrides it. I'm not sure what function is being used
 	//to save the settings of enabled,biometrics, passcode switches
@@ -251,6 +258,7 @@ void preferencesChanged() {
                    							 forName:USER_DEFAULTS_DOMAIN];
 	[biometricsSwitchControl setOn:false animated:true];
 
+	[self presentPasswordViewController];
    } else {
 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{TWEAK_SPECIFIER_KEY:@1, 
 																BIOMETRICS_SPECIFIER_KEY:@1, 
