@@ -8,7 +8,7 @@
 #define BIOMETRIC_CELL_INDEXPATH [NSIndexPath indexPathForRow:1 inSection:0]
 #define PASSCODE_CELL_INDEXPATH [NSIndexPath indexPathForRow:2 inSection:0]
 
-@interface APLRootListController : ATLApplicationListMultiSelectionController {
+@interface APLRootListController : ATLApplicationListMultiSelectionController<UIAdaptivePresentationControllerDelegate> {
     UITableView* _table;
 }
 

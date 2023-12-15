@@ -156,13 +156,18 @@ void preferencesChanged() {
 
 }
 
+//MARK: UIAdaptivePresentationControllerDelegate methods
+
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+    NSLog(@"presentation controller dismissed by user");
+}
+
 
 //MARK: helper methods
 
 -(void)presentPasswordViewController {
 	PasswordViewController *passwordVC = [[PasswordViewController alloc] init];
-
-
+	passwordVC.presentationController.delegate = self;
 	[self presentViewController:passwordVC animated:true completion:nil];
 }
 
@@ -232,6 +237,8 @@ void preferencesChanged() {
 																PASSCODE_SPECIFIER_KEY:@1}
                     						forName:USER_DEFAULTS_DOMAIN];
 	[passcodeSwitchControl setOn:true animated:true];
+	//when switching biometrics off and passcode on present PasswordViewController
+	[self presentPasswordViewController];
    }
 
 	//turn on isEnabled cell too 

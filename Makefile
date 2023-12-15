@@ -17,7 +17,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = AppLock
 
-AppLock_FILES = Tweak.x ButtonClass.m PasswordManager.m
+AppLock_FILES = Tweak.x ButtonClass.m PasswordManager.m 
 APPLock_FRAMEWORKS = UIKit LocalAuthentication 
 AppLock_PRIVATE_FRAMEWORKS = Preferences MobileCoreServices #UIKitCore #SpringBoard "adding springboard framework
 # stops symbols error but the entire tweak stops working even SBPowerDownController

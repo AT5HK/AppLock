@@ -15,10 +15,10 @@
     NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 
-    NSDictionary *bundleDefaultsPasscode = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.passcode"];
+    NSDictionary *bundleDefaultsPasscode = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN_PASSCODE];
 	NSLog(@"current passcode: %@", bundleDefaultsPasscode);
 
-    NSString *appLockPasscode = bundleDefaultsPassword[@"passcode"];
+    NSString *appLockPasscode = bundleDefaultsPasscode[BUNDLE_DEFAULTS_PASSCODE_KEY];
 
 
     BOOL isBiometricsEnabled = [bundleDefaults[BIOMETRICS_SPECIFIER_KEY] boolValue];
@@ -102,7 +102,7 @@
 
 -(void)showAlertControllerWithVC:(UIViewController *)VC {
    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
-                               message:@"No Biometrics, please enabled FaceID or TouchID in settings."
+                               message:@"No biometrics detected, please enabled FaceID or TouchID in settings."
                                preferredStyle:UIAlertControllerStyleAlert];
    
    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
