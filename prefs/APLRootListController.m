@@ -21,6 +21,10 @@ static PSSpecifier *tweakEnabledSpecifier;
 static PSSpecifier *biometricsSpecifier;
 static PSSpecifier *passcodeSpecifier;
 
+UISwitch *isEnabledSwitchControl;
+UISwitch *biometricsSwitchControl;
+UISwitch *passcodeSwitchControl;
+
 
 UITableView *myTableView;
 
@@ -160,10 +164,17 @@ void preferencesChanged() {
 
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
     NSLog(@"presentation controller dismissed by user");
+	[self userDismissedPasscodeVC];
 }
 
 
 //MARK: helper methods
+
+-(void)userDismissedPasscodeVC {
+	//the user slid down modal view, the password is not saved so switch of passcode
+	[passcodeSwitchControl setOn:false animated:true];
+	[self passcodeSwitchChanged:nil];
+}
 
 -(void)presentPasswordViewController {
 	PasswordViewController *passwordVC = [[PasswordViewController alloc] init];
@@ -283,13 +294,6 @@ void preferencesChanged() {
 	NSLog(@"current bundleDefaults: %@", bundleDefaults);
 }
 
--(void)openGithub {
-	[[UIApplication sharedApplication] 
-	openURL:[NSURL URLWithString:@"https://github.com/opa334/AltList"]
-	options:@{}
-	completionHandler:nil];
-}
-
 
 //MARK: tableView delegate
 
@@ -300,7 +304,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 	if ([indexPath compare:IS_ENABLED_CELL_INDEXPATH] == NSOrderedSame) {
 		PSSwitchTableCell *isEnabledSwitchCell = (PSSwitchTableCell*)cell;
 
-		UISwitch *isEnabledSwitchControl = (UISwitch*)[isEnabledSwitchCell control];
+		isEnabledSwitchControl = (UISwitch*)[isEnabledSwitchCell control];
 		[isEnabledSwitchControl addTarget:self 
 									action:@selector(isEnabledSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged]; 
@@ -313,7 +317,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 	if ([indexPath compare:BIOMETRIC_CELL_INDEXPATH] == NSOrderedSame) {
 		PSSwitchTableCell *biometricsSwitchCell = (PSSwitchTableCell*)cell;
 
-		UISwitch *biometricsSwitchControl = (UISwitch*)[biometricsSwitchCell control];
+		biometricsSwitchControl = (UISwitch*)[biometricsSwitchCell control];
 		[biometricsSwitchControl addTarget:self 
 									action:@selector(biometricsSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged]; 
@@ -325,7 +329,7 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 	if ([indexPath compare:PASSCODE_CELL_INDEXPATH] == NSOrderedSame) {
 		PSSwitchTableCell *passcodeSwitchCell = (PSSwitchTableCell*)cell;
 
-		UISwitch *passcodeSwitchControl = (UISwitch*)[passcodeSwitchCell control];
+		passcodeSwitchControl = (UISwitch*)[passcodeSwitchCell control];
 		[passcodeSwitchControl addTarget:self 
 									action:@selector(passcodeSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged];
