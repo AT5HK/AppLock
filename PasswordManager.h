@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Common.h"
+#import "UIAlertController+Fast.h"
 
 @interface PasswordManager : NSObject
 -(void)checkForPassword:(NSString *)password withCompletion:(void(^)(BOOL isPasswordCorrect))completion;

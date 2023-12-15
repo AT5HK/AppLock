@@ -9,6 +9,7 @@
 #define SCREEN_WIDTH [ [ UIScreen mainScreen ] bounds ].size.width
 #define SCREEN_HEIGHT [ [ UIScreen mainScreen ] bounds ].size.height
 
-#define PASSWORD_STRING_LENGTH 50
+#define PASSWORD_STRING_MAX_LENGTH 50
+#define PASSWORD_STRING_MIN_LENGTH 0
 #define USER_DEFAULTS_DOMAIN_PASSCODE @"com.applock.prefs.passcode"
 #define BUNDLE_DEFAULTS_PASSCODE_KEY @"passcode"

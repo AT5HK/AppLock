@@ -108,11 +108,17 @@
     NSString *passwordText = self.passwordTextField.text;
     NSString *retypePasswordText = self.retypePasswordTextField.text;
 
-    if (passwordText.length >= PASSWORD_STRING_LENGTH) { 
+    if (passwordText.length == PASSWORD_STRING_MIN_LENGTH) { 
+        NSString *alertMessage = @"Password must be atleast 1 character or more";
+        NSString *alertTitle = @"Error password too short";
+        [UIAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
+        return; 
+    }
+
+    if (passwordText.length >= PASSWORD_STRING_MAX_LENGTH) { 
         NSString *alertMessage = @"Password must be 50 characters or less";
-        NSString *alertTitle = @"Error Password too long";
-        UIAlertController *passwordAlertController = [[UIAlertController alloc] init];
-        [passwordAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
+        NSString *alertTitle = @"Error password too long";
+        [UIAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
         return; 
     }
 
@@ -121,8 +127,7 @@
         // UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
         NSString *alertMessage = @"passwords do not match";
         NSString *alertTitle = @"Error";
-        UIAlertController *passwordAlertController = [[UIAlertController alloc] init];
-        [passwordAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
+        [UIAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
         return;
     }
 
@@ -135,23 +140,6 @@
     NSLog(@"passcode in bundleDefaults: %@", bundleDefaults);
 
     [self dismissViewControllerAnimated:true completion:nil];
-}
-
--(void)showAlertControllerWithVC:(UIViewController *)VC {
-   UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
-                               message:@"Password doesn't match or is too long"
-                               preferredStyle:UIAlertControllerStyleAlert];
-   
-   UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-      handler:^(UIAlertAction * action) 
-      {
-        
-      }];
-   
-   
-
-   [alert addAction:defaultAction];
-   [VC presentViewController:alert animated:YES completion:nil];
 }
 
 //MARK: Keyboard methods

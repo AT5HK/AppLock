@@ -55,7 +55,9 @@
         }];
     } else {
         UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-        [self showAlertControllerWithVC:rootVC];
+        NSString *alertTitle = @"Error";
+        NSString *alertMessage = @"No biometrics detected, please enabled FaceID or TouchID in settings";
+        [UIAlertController showAlertControllerWithVC:rootVC withMessage:alertMessage withTitle:alertTitle];
         //don't run completion biometrics is not availalbe
         // completion(isBiometricsCorrect, nil); 
     }
@@ -80,8 +82,8 @@
 
 
 -(void)showAlertControllerPasswordCheckerWithVC:(UIViewController *)VC withCompletion:(void(^)(UIAlertController *alertController))completion {
-   UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"My Alert"
-                               message:@"This is an alert."
+   UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"App Locked"
+                               message:@"please enter your password"
                                preferredStyle:UIAlertControllerStyleAlert];
    
    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
@@ -95,23 +97,6 @@
    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.secureTextEntry = true;
     }];
-
-   [alert addAction:defaultAction];
-   [VC presentViewController:alert animated:YES completion:nil];
-}
-
--(void)showAlertControllerWithVC:(UIViewController *)VC {
-   UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
-                               message:@"No biometrics detected, please enabled FaceID or TouchID in settings."
-                               preferredStyle:UIAlertControllerStyleAlert];
-   
-   UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-      handler:^(UIAlertAction * action) 
-      {
-        
-      }];
-   
-   
 
    [alert addAction:defaultAction];
    [VC presentViewController:alert animated:YES completion:nil];
