@@ -110,14 +110,14 @@
 
     if (passwordText.length == PASSWORD_STRING_MIN_LENGTH) { 
         NSString *alertMessage = @"Password must be atleast 1 character or more";
-        NSString *alertTitle = @"Error password too short";
+        NSString *alertTitle = @"Error password is too short";
         [UIAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
         return; 
     }
 
     if (passwordText.length >= PASSWORD_STRING_MAX_LENGTH) { 
         NSString *alertMessage = @"Password must be 50 characters or less";
-        NSString *alertTitle = @"Error password too long";
+        NSString *alertTitle = @"Error password is too long";
         [UIAlertController showAlertControllerWithVC:self withMessage:alertMessage withTitle:alertTitle]; 
         return; 
     }
@@ -181,6 +181,7 @@
 // Implementing UITextFieldDelegate method to dismiss keyboard on return key press
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
+    [self setPasswordButtonAction:nil];
     return YES;
 }
 
