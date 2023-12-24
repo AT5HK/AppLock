@@ -19,7 +19,7 @@
 		<key>defaults</key>
 		<string>com.applock.prefs</string>
 		<key>key</key>
-		<string>isEnabled</string>
+		<string>switchIsEnabled</string>
 		<key>sections</key>
 		<array>
 			<dict>

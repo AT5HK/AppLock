@@ -13,3 +13,6 @@
 #define PASSWORD_STRING_MIN_LENGTH 0
 #define USER_DEFAULTS_DOMAIN_PASSCODE @"com.applock.prefs.passcode"
 #define BUNDLE_DEFAULTS_PASSCODE_KEY @"passcode"
+
+#define USER_DEFAULTS_DOMAIN_IS_ENABLED @"com.applock.prefs"
+#define BUNDLE_DEFAULTS_IS_ENABLED_KEY @"switchIsEnabled"

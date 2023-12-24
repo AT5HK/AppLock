@@ -2,9 +2,10 @@
 
 static PasswordManager *passwordManager;
 
+//bundle IDs of switches enabled to lock apps
 NSArray* updateEnabledBundleIDs() {
-   NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.applock.prefs"];
-   NSArray *enabledBundleIDs = bundleDefaults[@"isEnabled"];
+   NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN_IS_ENABLED];
+   NSArray *enabledBundleIDs = bundleDefaults[BUNDLE_DEFAULTS_IS_ENABLED_KEY];
    NSLog(@"the enabled bundle ids: %@", enabledBundleIDs);
    return enabledBundleIDs;
 }
