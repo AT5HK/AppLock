@@ -1,21 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "APLRootListController.h"
-// @import Preferences.PSSpecifier;
 #import <Preferences/Preferences.h>
-#import <objc/runtime.h>
-
-
-@interface NSDistributedNotificationCenter : NSNotificationCenter
-@end
-
-// @interface PSSwitchTableCell : UITableViewCell
-// -(void)setValue:(id)arg1;
-// -(void)setSelected:(BOOL)arg1 animated:(BOOL)arg2 ;
-// -(id)controlValue;
-// @end
-
-
-static NSDictionary *myBundleDefaults;
 
 static PSSpecifier *tweakEnabledSpecifier;
 static PSSpecifier *biometricsSpecifier;
@@ -25,11 +10,7 @@ UISwitch *isEnabledSwitchControl;
 UISwitch *biometricsSwitchControl;
 UISwitch *passcodeSwitchControl;
 
-
 UITableView *myTableView;
-
-NSMutableArray *_specefiers_copy;
-NSMutableArray *cellArray;
 
 @implementation APLRootListController
 
@@ -38,42 +19,9 @@ NSMutableArray *cellArray;
     if (self) {
         NSLog(@"init called successfully");
 		[self createCustomSpecifiers];
-		myBundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
     }
     return self;
 }
-
--(id)customRead {
-	NSLog(@"called customRead method");
-	return @0;
-}
-
-void preferencesChanged() {
-	NSLog(@"preferencesChanged called");
-
-// 	NSDictionary *bundleDefaults = [[NSUserDefaults standardUserDefaults] persistentDomainForName:USER_DEFAULTS_DOMAIN];
-//     NSNumber *isBiometricsEnabled = bundleDefaults[BIOMETRICS_SPECIFIER_KEY];
-
-//     PSSwitchTableCell *biometricsSwitchCell = [myTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
-// 	UISwitch *biometricsSwitchControl = (UISwitch*)biometricsSwitchCell.control;
-   
-//    if ([isBiometricsEnabled boolValue] == true) {
-// 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{BIOMETRICS_SPECIFIER_KEY:@0}
-//                     forName:USER_DEFAULTS_DOMAIN];
-// 	[biometricsSwitchControl setOn:true animated:true];
-
-//    } else {
-// 	[[NSUserDefaults standardUserDefaults] setPersistentDomain:@{BIOMETRICS_SPECIFIER_KEY:@1}
-//                     forName:USER_DEFAULTS_DOMAIN];
-// 	[biometricsSwitchControl setOn:false animated:true];
-//    }
-
-	// NSLog(@"the tableView: %@", myTableView);
-	
-	// NSLog(@"the PSSwitchCell: %@", switchCell);
-	// NSLog(@"the control value: %@", [switchCell controlValue]);
-}
-
 
 -(void)createCustomSpecifiers {
 	tweakEnabledSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Enabled"
@@ -137,17 +85,8 @@ void preferencesChanged() {
 }
 
 -(void)viewDidLoad {
-	cellArray = [NSMutableArray new];
-	// [self createCustomSpecifiers];	
 	NSLog(@"hello for viewDidLoad");
 	NSLog(@"the cellType: %ld", biometricsSpecifier.cellType);
-	
-	// CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), 
-	// 								NULL, 
-	// 								(CFNotificationCallback)preferencesChanged, 
-	// 								CFSTR("tweakEnabledSpecifier"), 
-	// 								NULL, 
-	// 								CFNotificationSuspensionBehaviorDeliverImmediately);
 
 	//run the original viewDidLoad			
 	[super viewDidLoad];	
@@ -182,6 +121,7 @@ void preferencesChanged() {
 	[self presentViewController:passwordVC animated:true completion:nil];
 }
 
+//not in use rn
 -(void)setupSwitchSettings {
 	//this runs after the PSListController settings and overrides it. I'm not sure what function is being used
 	//to save the settings of enabled,biometrics, passcode switches
@@ -192,8 +132,6 @@ void preferencesChanged() {
 	// BOOL isTweakEnabled = bundleDefaults[TWEAK_SPECIFIER_KEY];
 	// BOOL isBiometricsEnabled = bundleDefaults[BIOMETRICS_SPECIFIER_KEY];
 	// BOOL isPasscodeEnabled = bundleDefaults[PASSCODE_SPECIFIER_KEY];
-
-
 }
 
 -(void)isEnabledSwitchChanged:(id)sender {
@@ -309,8 +247,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 									action:@selector(isEnabledSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged]; 
 
-		// BOOL switchValue = myBundleDefaults[TWEAK_SPECIFIER_KEY];
-		// [isEnabledSwitchControl setOn:switchValue animated:false];
 
 	}
 
@@ -322,8 +258,6 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 									action:@selector(biometricsSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged]; 
 
-		// BOOL switchValue = myBundleDefaults[BIOMETRICS_SPECIFIER_KEY];
-		// [biometricsSwitchControl setOn:switchValue animated:false];
 	}
 
 	if ([indexPath compare:PASSCODE_CELL_INDEXPATH] == NSOrderedSame) {
@@ -334,20 +268,9 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
 									action:@selector(passcodeSwitchChanged:) 
 							forControlEvents:UIControlEventValueChanged];
 
-		// BOOL switchValue = myBundleDefaults[PASSCODE_SPECIFIER_KEY];
-		// [passcodeSwitchControl setOn:switchValue animated:false]; 
 	}
 
 	
 }
-
-// -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
-// 	PSSwitchTableCell *myCell = (PSSwitchTableCell*)[super tableView:tableView cellForRowAtIndexPath:indexPath];
-// 	UISwitch *switchControl = (UISwitch*)[myCell control];
-// 	NSLog(@"the cell: %@ and indexPath: %@, the UISwitch value: %d", myCell, indexPath, switchControl.on);
-	 
-// 	return myCell;
-// }
 
 @end

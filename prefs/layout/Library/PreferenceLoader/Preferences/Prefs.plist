@@ -15,7 +15,7 @@
 		<key>isController</key>
 		<true/>
 		<key>label</key>
-		<string>Prefs</string>
+		<string>App Lock</string>
 		<key>defaults</key>
 		<string>com.applock.prefs</string>
 		<key>key</key>
