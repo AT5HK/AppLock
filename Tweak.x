@@ -20,7 +20,10 @@ static void appLockSetup() {
    passwordManager = [PasswordManager sharedInstance];
 }
 
+//widgets AppPredictionsUIWidget.framework
 %hook APUIAppIconGridView
+
+//ios 14 - 15
    -(void)iconTapped:(SBIconView *)iconView {
       //check if AppLock tweak is enabled, if not run original method and exit hooked method
       if (isAppLockEnabled() == false) { %orig; return; } 
@@ -46,8 +49,10 @@ static void appLockSetup() {
 
 %end
 
+//spotlight searchUI.framework
 %hook SearchUIHomeScreenAppIconView
 
+//ios 14 - 17
 - (void)icon:(SBHApplicationIcon*)applicationIcon launchFromLocation:(id)arg2 context:(id)arg3 {
    //check if AppLock tweak is enabled, if not run original method and exit hooked method
    if (isAppLockEnabled() == false) { %orig; return; } 
@@ -73,8 +78,10 @@ static void appLockSetup() {
 
 %end
 
+//Springboard 
 %hook SBUIController
 
+//ios 11 - 17
 -(void)activateApplication:(SBApplication *)application fromIcon:(id)arg2 location:(long long)arg3 activationSettings:(id)arg4 actions:(id)arg5 {
    
    //check if AppLock tweak is enabled, if not run original method and exit hooked method

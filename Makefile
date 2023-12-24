@@ -1,8 +1,7 @@
-# export THEOS_DEVICE_IP=10.0.0.171 THEOS_DEVICE_PORT=22
 export THEOS_DEVICE_IP=127.0.0.1 
 export THEOS_DEVICE_PORT=2222
 
-export ARCHS = arm64 #armv7 arm64e
+export ARCHS = arm64 arm64e #armv7 < ios 10 and lower
 export TARGET := iphone:clang:16.4:7.0
 
 #both rootless and rootful causes errors. leave blank 
@@ -17,7 +16,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = AppLock
 
-AppLock_FILES = Tweak.x ButtonClass.m PasswordManager.m UIAlertController+Fast.m
+AppLock_FILES = Tweak.x PasswordManager.m UIAlertController+Fast.m
 APPLock_FRAMEWORKS = UIKit LocalAuthentication 
 AppLock_PRIVATE_FRAMEWORKS = Preferences MobileCoreServices #UIKitCore #SpringBoard "adding springboard framework
 # stops symbols error but the entire tweak stops working even SBPowerDownController
