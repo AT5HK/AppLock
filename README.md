@@ -2,7 +2,7 @@
 
 **If compiling yourself you must install dependency AltList: com.opa334.altlist on your device**
 
-Must be compiled with THEOS
+Compiled with THEOS
 
 Dependencies: mobilesubstrate (>= 0.9.5000), preferenceloader (>= 2.2.3), AltList (>= 1.0.10)
 
